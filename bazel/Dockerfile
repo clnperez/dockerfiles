@@ -15,6 +15,6 @@ RUN unzip -q bazel-$BAZEL_RELEASE-dist.zip && \
 ENV PATH=$PATH:/bazel/output/
 
 # CLEAN UP LATER
-RUN apt-get install -y git
+RUN apt-get update && apt-get install -y git
 
 RUN bazel version
