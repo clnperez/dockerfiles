@@ -14,7 +14,7 @@ RUN unzip -q bazel-$BAZEL_RELEASE-dist.zip && \
     ./compile.sh
 ENV PATH=$PATH:/bazel/output/
 
-# CLEAN UP LATER
-RUN apt-get update && apt-get install -y git
+# CLEAN UP LATER -- things needed for building envoy
+RUN apt-get update && apt-get install -y git golang-go cmake automake wget libtool m4 sudo vim-tiny
 
 RUN bazel version
