@@ -13,4 +13,8 @@ RUN curl -fSL -o bazel-${BAZEL_RELEASE}-dist.zip https://github.com/bazelbuild/b
 RUN unzip -q bazel-$BAZEL_RELEASE-dist.zip && \
     ./compile.sh
 ENV PATH=$PATH:/bazel/output/
+
+# CLEAN UP LATER
+RUN apt-get install -y git
+
 RUN bazel version
