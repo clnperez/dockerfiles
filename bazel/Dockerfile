@@ -4,21 +4,22 @@
 
 FROM debian:stretch
 
-ARG GO_VERSION=1.10.3
 ARG BAZEL_RELEASE=0.11.1
 
-RUN apt-get update && apt-get install -y build-essential openjdk-8-jdk python zip
-RUN apt-get install -y curl
+RUN apt-get update && apt-get install -y build-essential openjdk-8-jdk python zip git cmake automake wget libtool m4 sudo vim-tiny curl && \
+    rm -rf /var/cache/apt/lists/*
+
 RUN mkdir bazel
 WORKDIR bazel
-RUN curl -fSL -o bazel-${BAZEL_RELEASE}-dist.zip https://github.com/bazelbuild/bazel/releases/download/${BAZEL_RELEASE}/bazel-${BAZEL_RELEASE}-dist.zip
-RUN unzip -q bazel-$BAZEL_RELEASE-dist.zip && \
-    ./compile.sh
-ENV PATH=$PATH:/bazel/output/
+RUN curl -fSL -o bazel-${BAZEL_RELEASE}-dist.zip https://github.com/bazelbuild/bazel/releases/download/${BAZEL_RELEASE}/bazel-${BAZEL_RELEASE}-dist.zip && \
+    unzip -q bazel-$BAZEL_RELEASE-dist.zip && \
+    ./compile.sh && \
+    rm bazel-$BAZEL_RELEASE-dist.zip && \
+    mv output/bazel /usr/local/bin/. && \
+    cd / && \
+    rm -rf /bazel
 
-# CLEAN UP LATER -- things needed for building envoy
-RUN apt-get update && apt-get install -y git cmake automake wget libtool m4 sudo vim-tiny
-
+ARG GO_VERSION=1.10.3
 # update go. this version's way too old and buggy for some architectures
 RUN set -eux; \
     \
@@ -30,5 +31,7 @@ RUN set -eux; \
     esac; \
     wget -nv -O - https://storage.googleapis.com/golang/go${GO_VERSION}.linux-${ARCH}.tar.gz \
     | tar -C /usr/local -xz
+
+ENV PATH=$PATH:/usr/local/go/bin/
 
 RUN bazel version
