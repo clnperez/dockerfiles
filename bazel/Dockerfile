@@ -6,7 +6,7 @@ FROM debian:stretch
 
 ARG BAZEL_RELEASE=0.11.1
 
-RUN apt-get update && apt-get install -y build-essential openjdk-8-jdk python zip git cmake automake wget libtool m4 sudo vim-tiny curl && \
+RUN apt-get update && apt-get install -y build-essential openjdk-8-jdk python zip git cmake automake wget libtool m4 sudo vim-tiny curl pkg-config  && \
     rm -rf /var/cache/apt/lists/*
 
 RUN mkdir bazel
