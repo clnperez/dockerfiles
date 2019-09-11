@@ -6,7 +6,7 @@ FROM ubuntu:bionic
 
 ARG BAZEL_RELEASE=0.28.1
 
-RUN apt-get update && apt-get install -y automake g++-8 cmake git wget libtool m4 sudo vim-tiny \
+RUN apt-get update && apt-get install -y automake g++-8 binutils-gold cmake git wget libtool m4 sudo vim-tiny \
             curl pkg-config ninja-build openjdk-11-jdk python3 zip unzip && \
     rm -rf /var/cache/apt/lists/*
 
@@ -15,8 +15,9 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN mkdir bazel
 WORKDIR bazel
 RUN curl -fSL -o bazel-${BAZEL_RELEASE}-dist.zip https://github.com/bazelbuild/bazel/releases/download/${BAZEL_RELEASE}/bazel-${BAZEL_RELEASE}-dist.zip && \
-    unzip -q bazel-$BAZEL_RELEASE-dist.zip && \
-    EXTRA_BAZEL_ARGS="--sandbox_debug -s --verbose_failures --host_javabase=@local_jdk//:jdk --copt=-Wno-unused-result --cxxopt=-Wno-unused-result" ./compile.sh && \
+    unzip -q bazel-$BAZEL_RELEASE-dist.zip
+# debug... split. put back to one line after patch verified
+RUN EXTRA_BAZEL_ARGS="--sandbox_debug -s --verbose_failures --host_javabase=@local_jdk//:jdk --copt=-Wno-unused-result --cxxopt=-Wno-unused-result" ./compile.sh && \
     rm bazel-$BAZEL_RELEASE-dist.zip && \
     mv output/bazel /usr/local/bin/. && \
     cd / && \
