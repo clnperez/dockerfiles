@@ -6,7 +6,10 @@ FROM ubuntu:bionic
 
 ARG BAZEL_RELEASE=0.27.0
 
-RUN apt-get update && apt-get install -y automake cmake git wget libtool m4 sudo vim-tiny curl pkg-config ninja-build python && \
+RUN apt-get update && apt-get install -y automake cmake \
+    clang-8 llvm-8 lld-8 \
+    openjdk-11-jdk \
+    git wget libtool m4 sudo vim-tiny curl pkg-config ninja-build python && \
     rm -rf /var/cache/apt/lists/*
 
 RUN mkdir bazel
@@ -24,23 +27,5 @@ RUN sh ` \
        ;; \
     esac `
 
-# don't install go. with the fixes to rules_go we can pull down the binary now
-#ARG GO_VERSION=1.10.3
-# update go. this version's way too old and buggy for some architectures
-#RUN set -eux; \
-#    \
-#    arch="$(uname -m)"; \
-#    case "${arch##*-}" in \
-#        x86_64 | amd64) ARCH='amd64' ;; \
-#        ppc64el | ppc64le) ARCH='ppc64le' ;; \
-#        *) echo "unsupported architecture"; exit 1 ;; \
-#    esac; \
-#    wget -nv -O - https://storage.googleapis.com/golang/go${GO_VERSION}.linux-${ARCH}.tar.gz \
-#    | tar -C /usr/local -xz
-
-#ENV PATH=$PATH:/usr/local/go/bin/
-
-RUN apt-get update && apt-get install -y openjdk-8-jdk && \ 
-    rm -rf /var/cache/apt/lists/*
 
 RUN bazel version
