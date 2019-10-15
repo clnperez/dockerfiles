@@ -1,0 +1,18 @@
+## To use this once built, bind-mount in whatever project you're building to a user's home dir.
+## You'll lose your cache when you exit the container though, b/c bazel sym-links the
+## output to ~/.cache/bazel/, which is outside the docker build scope on your system.
+
+FROM ubuntu:xenial
+
+
+RUN apt-get update && apt-get install -y automake clang llvm cmake git wget libtool m4 sudo vim-tiny \
+            curl pkg-config ninja-build openjdk-8-jdk python3 zip unzip && \
+    rm -rf /var/cache/apt/lists/*
+
+RUN curl -fsSL https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_16.04/bazel_bin_ppc64le_0.25.0 -o /usr/bin/bazel && \
+    chmod +x /usr/bin/bazel && \
+    git clone https://github.com/bazelbuild/bazel.git && \
+    cd bazel
+
+RUN echo "#bazel build --show_progress_rate_limit=5 --curses=yes --color=yes --terminal_columns=143 --show_timestamps --verbose_failures --keep_going --jobs=32  //src:bazel"
+
