@@ -1,0 +1,25 @@
+## To run this, bind-mount in whatever project you're building to a user's home dir.
+## You'll lose your cache when you exit the container though, b/c bazel sym-links the
+## output to ~/.cache/bazel/, which is outside the docker build scope on your system.
+
+FROM ubuntu:bionic
+
+ARG BAZEL_RELEASE=0.28.1
+
+RUN apt-get update && apt-get install -y automake clang-8 llvm-8 lld-8 cmake git wget libtool m4 sudo vim-tiny \
+            curl pkg-config ninja-build openjdk-11-jdk python3 zip unzip && \
+    rm -rf /var/cache/apt/lists/*
+
+RUN mkdir bazel
+WORKDIR bazel
+ENV BAZEL_RELEASE=${BAZEL_RELEASE}
+RUN echo "Downloading bazel dist archive for version $BAZEL_RELEASE" && \
+    curl -fSL -o bazel-${BAZEL_RELEASE}-dist.zip https://github.com/bazelbuild/bazel/releases/download/${BAZEL_RELEASE}/bazel-${BAZEL_RELEASE}-dist.zip && \
+    unzip -q bazel-$BAZEL_RELEASE-dist.zip && \
+    EXTRA_BAZEL_ARGS="--sandbox_debug -s --verbose_failures --host_javabase=@local_jdk//:jdk --copt=-Wno-unused-result --cxxopt=-Wno-unused-result" ./compile.sh && \
+    rm bazel-$BAZEL_RELEASE-dist.zip && \
+    mv output/bazel /usr/local/bin/. && \
+    cd / && \
+    rm -rf /bazel
+
+RUN bazel version
