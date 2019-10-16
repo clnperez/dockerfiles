@@ -9,16 +9,20 @@ RUN apt-get update && apt-get install -y automake clang-8 llvm-8 lld-8 cmake git
             curl pkg-config ninja-build openjdk-11-jdk python3 zip unzip && \
     rm -rf /var/cache/apt/lists/*
 
+# srsly ... 
 RUN curl -fsSL https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_18.04/bazel_bin_ppc64le_0.27.2 -o /usr/bin/bazel && \
-    chmod +x /usr/bin/bazel && \
+    chmod +x /usr/bin/bazel && \ 
+    git clone https://github.com/clnperez/bazel.git --branch 0.29.0-ppc64le && cd bazel && \
+    bazel build --sandbox_debug -s --verbose_failures --host_javabase=@local_jdk//:jdk //src:bazel && \
+    mv bazel-bin/src/bazel /usr/bin/bazel && cd ../ && \
+    rm -rf bazel && \
     git clone https://github.com/bazelbuild/bazel.git && \
     cd bazel && \
-    bazel build --sandbox_debug -s --verbose_failures --host_javabase=@local_jdk//:jdk //src:bazel && \
+    bazel build --server_javabase=/usr --sandbox_debug -s --verbose_failures --host_javabase=@local_jdk//:jdk //src:bazel && \
     mv bazel-bin/src/bazel /usr/local/bin/. && \
     rm /usr/bin/bazel && \
     cd ../ && \
     rm -rf /bazel && \
     rm -rf /var/lib/apt/lists/*
-
 
 RUN bazel version
