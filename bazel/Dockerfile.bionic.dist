@@ -22,4 +22,5 @@ RUN echo "Downloading bazel dist archive for version $BAZEL_RELEASE" && \
     cd / && \
     rm -rf /bazel
 
+RUN ls -lah /usr/local/bin/bazel
 RUN bazel version

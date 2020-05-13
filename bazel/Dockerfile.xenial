@@ -7,8 +7,8 @@ FROM ubuntu:xenial
 ARG BAZEL_RELEASE=0.24.1
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E9377A2BA9EF27F && \
-    echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu xenial main"| tee /etc/apt/sources.list.d/ubuntu-toolchain-r-ubuntu-test-bionic.list && \
-    apt-get update && apt-get install -y build-essential g++-7 openjdk-8-jdk python zip git cmake automake wget libtool m4 sudo vim-tiny curl pkg-config ninja-build && \
+    echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu xenial main"| tee /etc/apt/sources.list.d/ubuntu-toolchain-r-ubuntu-test-xenial.list && \
+    apt-get update && apt-get install -y build-essential g++-7 clang openjdk-8-jdk python zip git cmake automake wget libtool m4 sudo vim-tiny curl pkg-config ninja-build && \
     rm -rf /var/cache/apt/lists/*
 
 RUN mkdir bazel

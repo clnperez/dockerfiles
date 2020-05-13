@@ -4,21 +4,21 @@
 
 FROM ubuntu:bionic
 
+ENV BAZEL_BIN="https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_18.04/bazel_bin_ppc64le_3.0.0"
 
 RUN apt-get update && apt-get install -y automake clang-8 llvm-8 lld-8 cmake git wget libtool m4 sudo vim-tiny \
             curl pkg-config ninja-build openjdk-11-jdk python3 zip unzip && \
-    rm -rf /var/cache/apt/lists/*
-
-# srsly ... 
-RUN curl -fsSL https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_18.04/bazel_bin_ppc64le_1.1.0 -o /usr/bin/bazel && \
+    curl -fsSL "${BAZEL_BIN}" -o /usr/bin/bazel && \
     chmod +x /usr/bin/bazel && \ 
     git clone https://github.com/bazelbuild/bazel.git && \
     cd bazel && \
     bazel build --sandbox_debug -s --verbose_failures --host_javabase=@local_jdk//:jdk //src:bazel && \
-    mv bazel-bin/src/bazel /usr/local/bin/. && \
+    cp bazel-bin/src/bazel /usr/local/bin/. && \
+    bazel --server_javabase=/usr clean --expunge && \
     rm /usr/bin/bazel && \
     cd ../ && \
-    rm -rf /bazel && \
+    rm -rf bazel && \
+    rm -rf /var/cache/apt/lists/* && \
     rm -rf /var/lib/apt/lists/*
 
 RUN bazel --server_javabase=/usr version
