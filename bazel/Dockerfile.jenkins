@@ -32,7 +32,7 @@ RUN groupadd -g ${gid} ${group} && \
 # setup sudo
 RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# clang-8 from unstable
+# clang-9 from unstable
 RUN echo "deb http://deb.debian.org/debian unstable main" >> /etc/apt/sources.list && \
     apt-get update && apt-get install -y clang-9 lld-9
 
@@ -41,8 +41,8 @@ RUN echo "deb http://deb.debian.org/debian unstable main" >> /etc/apt/sources.li
 #    curl -fSL https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_16.04/latest/${BAZEL_LATEST} \
 #    -o /usr/local/bin/bazel && chmod 755 /usr/local/bin/bazel
 
-# lock to bazel 2.2.0
-RUN curl https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_16.04/bazel_bin_ppc64le_2.2.0 -o /usr/local/bin/bazel && chmod 755 /usr/local/bin/bazel
+# lock to bazel 3.4.1
+RUN curl https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_16.04/bazel_bin_ppc64le_3.4.1 -o /usr/local/bin/bazel && chmod 755 /usr/local/bin/bazel
 
 ARG GO_VERSION=1.13.7
 RUN set -eux; \
