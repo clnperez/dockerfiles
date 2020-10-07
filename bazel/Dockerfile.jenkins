@@ -33,8 +33,10 @@ RUN groupadd -g ${gid} ${group} && \
 RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # clang-9 from unstable
+# hack: install gcc-8-base to prevent install error - libc6-dev breaks libgcc-8-dev
 RUN echo "deb http://deb.debian.org/debian unstable main" >> /etc/apt/sources.list && \
-    apt-get update && apt-get install -y clang-9 lld-9
+    apt-get update && apt-get install -y gcc-8-base clang-10 lld-10 && \
+    rm -rf /var/cache/apt/lists/*
 
 #RUN BAZEL_LATEST="$(curl https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_16.04/latest/ 2>&1 \
 #    | sed -n 's/.*href="\([^"]*\).*/\1/p' | grep '^bazel' | head -n 1)" && \
