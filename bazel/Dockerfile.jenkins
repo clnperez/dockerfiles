@@ -12,8 +12,8 @@ ENV uid=10000
 ENV gid=10000
 ENV JENKINS_AGENT_HOME=/home/${user}
 
-RUN apt-get update && apt-get install -y build-essential openjdk-11-jdk python zip git cmake automake wget libtool m4 sudo vim-tiny \
-    curl pkg-config ninja-build && \
+RUN apt-get update && apt-get install -y build-essential openjdk-11-jdk python zip git cmake automake autoconf make wget libtool m4 sudo vim-tiny \
+    curl pkg-config ninja-build unzip virtualenv && \
     rm -rf /var/cache/apt/lists/*
 
 # gcc ppa for latest gcc
