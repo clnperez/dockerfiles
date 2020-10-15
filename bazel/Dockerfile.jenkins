@@ -44,6 +44,25 @@ RUN update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-10 1
     update-alternatives --config clang && \
     update-alternatives --config clang++ && \
     update-alternatives --config clang-tidy
+
+# build gn and run tests
+# revert a few changes
+# 282a428cc9603abb65d985144b92caa225cd6392 --icf change
+# 082fbe397d5217dc21b01c63c7f20eb6b77a3093 lpthread change
+#
+# Gn changes at https://gn-review.googlesource.com/c/gn/+/9740
+# will not work with older V8 branches as of now. Need to checkout it's parent.
+#
+RUN git clone https://gn.googlesource.com/gn && \
+    cd gn && \
+    sed -i -e 's/-Wl,--icf=all//g' ./build/gen.py && \
+    sed -i -e 's/-lpthread/-pthread/g' ./build/gen.py && \
+    python build/gen.py && \
+    ninja -C out && \
+    out/gn_unittests && \
+    cp /home/gn/out/gn /bin/gn && \
+    chmod +x /bin/gn
+
 #RUN BAZEL_LATEST="$(curl https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_16.04/latest/ 2>&1 \
 #    | sed -n 's/.*href="\([^"]*\).*/\1/p' | grep '^bazel' | head -n 1)" && \
 #    curl -fSL https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_16.04/latest/${BAZEL_LATEST} \
