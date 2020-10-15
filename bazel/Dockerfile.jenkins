@@ -38,6 +38,12 @@ RUN echo "deb http://deb.debian.org/debian unstable main" >> /etc/apt/sources.li
     apt-get update && apt-get install -y gcc-8-base clang-10 lld-10 && \
     rm -rf /var/cache/apt/lists/*
 
+RUN update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-10 1000 && \
+    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-10 1000 && \
+    update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-10 1000 && \
+    update-alternatives --config clang && \
+    update-alternatives --config clang++ && \
+    update-alternatives --config clang-tidy
 #RUN BAZEL_LATEST="$(curl https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_16.04/latest/ 2>&1 \
 #    | sed -n 's/.*href="\([^"]*\).*/\1/p' | grep '^bazel' | head -n 1)" && \
 #    curl -fSL https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_16.04/latest/${BAZEL_LATEST} \
