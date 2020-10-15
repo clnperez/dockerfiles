@@ -12,19 +12,14 @@ ENV uid=10000
 ENV gid=10000
 ENV JENKINS_AGENT_HOME=/home/${user}
 
-RUN apt-get update && apt-get install -y build-essential openjdk-11-jdk python zip git cmake automake autoconf make wget libtool m4 sudo vim-tiny \
+RUN apt-get update && apt-get install -y build-essential python python3 zip git cmake automake autoconf make wget libtool m4 sudo vim-tiny \
     curl pkg-config ninja-build unzip virtualenv && \
     rm -rf /var/cache/apt/lists/*
 
-# gcc ppa for latest gcc
-# RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test && apt-get update && apt-get install -y g++-7 && \
-#     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 1000 && \
-#     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 1000 && \
-#     update-alternatives --config gcc && \
-#     update-alternatives --config g++
-
 ENV JENKINS_AGENT_HOME=${JENKINS_AGENT_HOME}
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-ppc64el
+# remove openjdk-11-jdk for now since we are not explicitly building
+# java projects and we can probably just use the bazel bundled jdk
+# ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-ppc64el
 
 RUN groupadd -g ${gid} ${group} && \
     useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
