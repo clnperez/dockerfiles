@@ -2,7 +2,7 @@
 ## You'll lose your cache when you exit the container though, b/c bazel sym-links the
 ## output to ~/.cache/bazel/, which is outside the docker build scope on your system.
 
-FROM debian:buster
+FROM ubuntu:18.04
 
 # Below was taken from https://github.com/jenkinsci/docker-ssh-slave
 
@@ -12,14 +12,12 @@ ENV uid=10000
 ENV gid=10000
 ENV JENKINS_AGENT_HOME=/home/${user}
 
-RUN apt-get update && apt-get install -y build-essential python python3 zip git cmake automake autoconf make wget libtool m4 sudo vim-tiny \
+RUN apt-get update && apt-get install -y build-essential openjdk-11-jdk python python3 zip git cmake automake autoconf make wget libtool m4 sudo vim-tiny \
     curl pkg-config ninja-build unzip virtualenv && \
     rm -rf /var/cache/apt/lists/*
 
 ENV JENKINS_AGENT_HOME=${JENKINS_AGENT_HOME}
-# remove openjdk-11-jdk for now since we are not explicitly building
-# java projects and we can probably just use the bazel bundled jdk
-# ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-ppc64el
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-ppc64el
 
 RUN groupadd -g ${gid} ${group} && \
     useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
@@ -27,10 +25,8 @@ RUN groupadd -g ${gid} ${group} && \
 # setup sudo
 RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# clang-9 from unstable
-# hack: install gcc-8-base to prevent install error - libc6-dev breaks libgcc-8-dev
-RUN echo "deb http://deb.debian.org/debian unstable main" >> /etc/apt/sources.list && \
-    apt-get update && apt-get install -y gcc-8-base clang-10 lld-10 && \
+# clang-10 from 18.04 base repo
+RUN apt-get update && apt-get install -y clang-10 lld-10 clang-tidy-10 && \
     rm -rf /var/cache/apt/lists/*
 
 RUN update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-10 1000 && \
@@ -55,7 +51,7 @@ RUN git clone https://gn.googlesource.com/gn && \
     python build/gen.py && \
     ninja -C out && \
     out/gn_unittests && \
-    cp /home/gn/out/gn /bin/gn && \
+    cp ./out/gn /bin/gn && \
     chmod +x /bin/gn
 
 #RUN BAZEL_LATEST="$(curl https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_16.04/latest/ 2>&1 \
@@ -64,7 +60,7 @@ RUN git clone https://gn.googlesource.com/gn && \
 #    -o /usr/local/bin/bazel && chmod 755 /usr/local/bin/bazel
 
 # lock to bazel 3.4.1
-RUN curl https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_16.04/bazel_bin_ppc64le_3.4.1 -o /usr/local/bin/bazel && chmod 755 /usr/local/bin/bazel
+RUN curl https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_18.04/bazel_bin_ppc64le_3.4.1 -o /usr/local/bin/bazel && chmod 755 /usr/local/bin/bazel
 
 ARG GO_VERSION=1.13.7
 RUN set -eux; \
