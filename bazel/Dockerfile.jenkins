@@ -18,7 +18,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 ENV TZ="Etc/UTC"
 
 RUN apt-get update && apt-get install -y build-essential openjdk-11-jdk python python3 zip git cmake automake autoconf make wget libtool m4 sudo vim-tiny \
-    curl pkg-config ninja-build unzip virtualenv && \
+    curl pkg-config ninja-build unzip virtualenv clang-10 lld-10 clang-tidy-10 && \
     rm -rf /var/cache/apt/lists/*
 
 ENV JENKINS_AGENT_HOME=${JENKINS_AGENT_HOME}
@@ -28,10 +28,6 @@ RUN groupadd -g ${gid} ${group} && \
 
 # setup sudo
 RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
-# clang-10 from 18.04 base repo
-RUN apt-get update && apt-get install -y clang-10 lld-10 clang-tidy-10 && \
-    rm -rf /var/cache/apt/lists/*
 
 RUN update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-10 1000 && \
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-10 1000 && \
@@ -57,7 +53,8 @@ RUN git clone https://gn.googlesource.com/gn && \
     ninja -C out && \
     out/gn_unittests && \
     cp ./out/gn /bin/gn && \
-    chmod +x /bin/gn
+    chmod +x /bin/gn && \
+    cd ../ && rm -rf gn
 
 RUN BAZEL_LATEST="$(curl https://ftp2.osuosl.org/pub/ppc64el/bazel/ubuntu_${VERSION}/latest/ 2>&1 \
     | sed -n 's/.*href="\([^"]*\).*/\1/p' | grep '^bazel' | head -n 1)" && \
@@ -77,6 +74,6 @@ RUN set -eux; \
     wget -nv -O - https://storage.googleapis.com/golang/go${GO_VERSION}.linux-${ARCH}.tar.gz \
     | tar -C /usr/local -xz
 
-ENV PATH=$PATH:/usr/local/go/bin/:$JAVA_HOME/bin
+ENV PATH=$PATH:/usr/local/go/bin/
 
 RUN bazel version
