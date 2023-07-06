@@ -55,7 +55,7 @@ RUN git clone https://gn.googlesource.com/gn && \
     python build/gen.py && \
     ninja -C out && \
     out/gn_unittests && \
-    cp ./out/gn /bin/gn && \
+    mv ./out/gn /bin/gn && \
     chmod +x /bin/gn
 
 
