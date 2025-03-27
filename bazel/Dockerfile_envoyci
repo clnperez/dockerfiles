@@ -74,7 +74,7 @@ ENV PATH=$PATH:/usr/local/go/bin/:$JAVA_HOME/bin
 
 # https://github.com/envoyproxy/envoy-build-tools/blob/main/.bazelversion
 # todo: build and use bazelisk to pull the right version (use the bazel url env var)
-RUN curl https://github.com/Jenkins-J/bazel/releases/download/bazel-7.4.0-ppc64le-release/bazel-7.4.0-ppc64le-release -o /usr/local/bin/bazel && chmod 755 /usr/local/bin/bazel
+RUN curl -L https://github.com/Jenkins-J/bazel/releases/download/bazel-7.4.0-ppc64le-release/bazel-7.4.0-ppc64le-release -o /usr/local/bin/bazel && chmod 755 /usr/local/bin/bazel
 
 RUN bazel version
 
