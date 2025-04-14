@@ -17,7 +17,7 @@ ARG TZ=UTC
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential clang-14 lld-14 clang-tidy-14 \
     python3 python3-pip zip git gn cmake automake autoconf make wget libtool m4 sudo vim-tiny \
-    curl pkg-config openssl libssl-dev ninja-build openjdk-11-jdk unzip virtualenv tzdata && \
+    curl pkg-config openssl libssl-dev ninja-build openjdk-21-jdk unzip virtualenv tzdata libtinfo5 && \
     rm -rf /var/cache/apt/lists/*
 
 
@@ -25,7 +25,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
 RUN echo "${user} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 #ENV JENKINS_AGENT_HOME=${JENKINS_AGENT_HOME}
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-ppc64el
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-ppc64el
 
 RUN groupadd -g ${gid} ${group} && \
     useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
@@ -74,7 +74,22 @@ ENV PATH=$PATH:/usr/local/go/bin/:$JAVA_HOME/bin
 
 # https://github.com/envoyproxy/envoy-build-tools/blob/main/.bazelversion
 # todo: build and use bazelisk to pull the right version (use the bazel url env var)
-RUN curl https://ftp2.osuosl.org/pub/ppc64el/bazel/ubuntu_22.04/bazel-6.3.2 -o /usr/local/bin/bazel && chmod 755 /usr/local/bin/bazel
+RUN curl -L https://github.com/Jenkins-J/bazel/releases/download/bazel-7.4.0-ppc64le-release/bazel-7.4.0-ppc64le-release -o /usr/local/bin/bazel && chmod 755 /usr/local/bin/bazel
+
+# Build cargo-bazel as there is no release available for Power
+
+# Install cargo build tools
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+source "$HOME/.cargo/env"
+
+# Download rules_rust and build cargo-bazel
+RUN curl -L https://github.com/bazelbuild/rules_rust/releases/download/0.56.0/rules_rust-0.56.0.tar.gz \
+&& mkdir rules_rust
+&& tar -C rules_rust -xzvf rules_rust-0.56.0.tar.gz \
+&& cd rules_rust/crate_universe \
+&& cargo build --bin=cargo-bazel \
+&& export CARGO_BAZEL_GENERATOR_URL="file://$(pwd)/target/debug/cargo-bazel \
+&& cd "$HOME"
 
 RUN bazel version
 
