@@ -83,7 +83,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && s
 
 # Download rules_rust and build cargo-bazel
 RUN curl -L https://github.com/bazelbuild/rules_rust/releases/download/0.56.0/rules_rust-0.56.0.tar.gz \
-&& mkdir rules_rust
+&& mkdir rules_rust \
 && tar -C rules_rust -xzvf rules_rust-0.56.0.tar.gz \
 && cd rules_rust/crate_universe \
 && cargo build --bin=cargo-bazel \
