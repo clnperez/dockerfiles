@@ -79,8 +79,7 @@ RUN curl -L https://github.com/Jenkins-J/bazel/releases/download/bazel-7.4.0-ppc
 # Build cargo-bazel as there is no release available for Power
 
 # Install cargo build tools
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-source "$HOME/.cargo/env"
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && source "$HOME/.cargo/env"
 
 # Download rules_rust and build cargo-bazel
 RUN curl -L https://github.com/bazelbuild/rules_rust/releases/download/0.56.0/rules_rust-0.56.0.tar.gz \
