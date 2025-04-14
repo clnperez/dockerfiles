@@ -82,7 +82,7 @@ RUN curl -L https://github.com/Jenkins-J/bazel/releases/download/bazel-7.4.0-ppc
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && . "$HOME/.cargo/env"
 
 # Download rules_rust and build cargo-bazel
-RUN curl -L https://github.com/bazelbuild/rules_rust/releases/download/0.56.0/rules_rust-0.56.0.tar.gz \
+RUN curl -LO https://github.com/bazelbuild/rules_rust/releases/download/0.56.0/rules_rust-0.56.0.tar.gz \
 && mkdir rules_rust \
 && tar -C rules_rust -xzvf rules_rust-0.56.0.tar.gz \
 && cd rules_rust/crate_universe \
