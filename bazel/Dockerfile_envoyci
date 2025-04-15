@@ -88,8 +88,9 @@ RUN curl -LO https://github.com/bazelbuild/rules_rust/releases/download/0.56.0/r
 && cd rules_rust/crate_universe \
 && . "$HOME/.cargo/env" \
 && cargo build --bin=cargo-bazel \
-&& export CARGO_BAZEL_GENERATOR_URL="file://$(pwd)/target/debug/cargo-bazel" \
 && cd "$HOME"
+
+ENV CARGO_BAZEL_GENERATOR_URL="file:///rules_rust/crate_universe/target/debug/cargo-bazel"
 
 RUN bazel version
 
