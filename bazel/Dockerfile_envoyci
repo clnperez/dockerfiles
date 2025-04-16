@@ -77,12 +77,8 @@ ENV PATH=$PATH:/usr/local/go/bin/:$JAVA_HOME/bin
 RUN curl -L https://github.com/Jenkins-J/bazel/releases/download/bazel-7.4.0-ppc64le-release/bazel-7.4.0-ppc64le-release -o /usr/local/bin/bazel && chmod 755 /usr/local/bin/bazel
 
 # Build cargo-bazel as there is no release available for Power
-
-# Install cargo build tools
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
-# Download rules_rust and build cargo-bazel
-RUN curl -LO https://github.com/bazelbuild/rules_rust/releases/download/0.56.0/rules_rust-0.56.0.tar.gz \
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+&& curl -LO https://github.com/bazelbuild/rules_rust/releases/download/0.56.0/rules_rust-0.56.0.tar.gz \
 && mkdir rules_rust \
 && tar -C rules_rust -xzvf rules_rust-0.56.0.tar.gz \
 && cd rules_rust/crate_universe \
@@ -91,7 +87,8 @@ RUN curl -LO https://github.com/bazelbuild/rules_rust/releases/download/0.56.0/r
 && cp /rules_rust/crate_universe/target/debug/cargo-bazel /usr/local/bin/cargo-bazel \
 && cd "$HOME" \
 && rm /rules_rust-0.56.0.tar.gz \
-&& rm -r /rules_rust
+&& rm -r /rules_rust \
+&& rustup self uninstall -y
 
 ENV CARGO_BAZEL_GENERATOR_URL="file:///usr/local/bin/cargo-bazel"
 
