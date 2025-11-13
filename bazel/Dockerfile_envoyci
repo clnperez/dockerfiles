@@ -15,7 +15,7 @@ ARG TZ=UTC
 
 # installing req versions taken from tools/base/requirements.in and .github/workflows/codeql-push.yml
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential clang-14 lld-14 clang-tidy-14 \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential \
     python3 python3-pip zip git gn cmake automake autoconf make wget libtool m4 sudo vim-tiny \
     curl pkg-config openssl libssl-dev ninja-build openjdk-21-jdk unzip virtualenv tzdata libtinfo5 && \
     rm -rf /var/cache/apt/lists/*
@@ -30,9 +30,12 @@ ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-ppc64el
 RUN groupadd -g ${gid} ${group} && \
     useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
 
-RUN update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-14 1000 && \
-    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 1000 && \
-    update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-14 1000 && \
+RUN curl -LO https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/clang+llvm-18.1.8-powerpc64le-linux-rhel-8.8.tar.xz && \
+    tar -xvf clang+llvm-18.1.8-powerpc64le-linux-rhel-8.8.tar.xz
+
+RUN update-alternatives --install /usr/bin/clang++ clang++ $(pwd)/clang+llvm-18.1.8-powerpc64le-linux-rhel-8.8/bin/clang++ 1000 && \
+    update-alternatives --install /usr/bin/clang clang $(pwd)/clang+llvm-18.1.8-powerpc64le-linux-rhel-8.8/bin/clang 1000 && \
+    update-alternatives --install /usr/bin/clang-tidy clang-tidy $(pwd)/clang+llvm-18.1.8-powerpc64le-linux-rhel-8.8/bin/clang-tidy 1000 && \
     update-alternatives --config clang && \
     update-alternatives --config clang++ && \
     update-alternatives --config clang-tidy
